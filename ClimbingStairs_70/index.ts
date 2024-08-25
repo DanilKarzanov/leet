@@ -9,7 +9,7 @@ function climbStairs(n: number): number {
     return climbStairs(n - 1) + climbStairs(n - 2)
 }
 
-const memo = new Map()
+// const memo = new Map()
 
 function climbStairsMemo(n: number): number {
     if (n === 1 || n === 2) {
