@@ -54,4 +54,5 @@ func isValid(s string) bool {
 
 func main() {
 	fmt.Print(isValid("[("))
+	fmt.Print("smth to test stdout")
 }
