@@ -1,46 +1,59 @@
-// s - большая строка 
-// t - символы вхождения которых надо найти в s
+function mapSatisfies(etalon: Map<any, any>, window: Map<any, any>): boolean {
+    for (let [key, value] of etalon) {
+        if (value > window.get(key) || !window.has(key)) {
+            return false
+        }
+    }
+
+    return true
+}
+
 function minWindow(s: string, t: string): string {
-    let minimumSubstring: string = ""
-    let occuredLetters = new Map()
-    let leftPointer: number = 0
-
-    const fillMap = function() {
-        for (let char of t) {
-            if (occuredLetters.get(char)) {
-                occuredLetters.set(char, occuredLetters.get(char) + 1)
-            } else {
-                occuredLetters.set(char, 1)
-            }
-        }
+    if (t.length === 0) {
+        return ""
     }
 
-    fillMap()
-    console.log("map - ", occuredLetters)
-    
-    for (let rightPointer = 0; rightPointer < s.length; rightPointer++) {
-        let currentRight = s[rightPointer]
+    let etalonMap = new Map()
+    let windowMap = new Map()
 
-        console.log("right pointer elem - ", currentRight)
-
-
-        if (occuredLetters.get(currentRight)) {
-            occuredLetters.set(currentRight, occuredLetters.get(currentRight) - 1)
-            if (occuredLetters.get(currentRight) === 0) {
-                occuredLetters.delete(currentRight)
-            }
-            
-            console.log("delete from map", occuredLetters)
-        }
-
-        if (occuredLetters.size === 0) {
-            minimumSubstring = s.slice(leftPointer, rightPointer)
-            return minimumSubstring
-        } 
-    
+    for (let char of t) {        // filling the etalon map from t
+        if (etalonMap.has(char)) {
+            etalonMap.set(char, etalonMap.get(char) + 1)
+        } else etalonMap.set(char, 1)
     }
 
-    return minimumSubstring
+    let l = 0       // left pointer
+    let r = 0       // right pointer
+
+    let res = ""
+    let resLength = Infinity
+
+    while (r < s.length) {
+        if (etalonMap.has(s[r])) {               // если это нужный нам символ заносим его
+            if (windowMap.has(s[r])) {
+                windowMap.set(s[r], windowMap.get(s[r]) + 1)
+            } else windowMap.set(s[r], 1)
+        }
+
+        while (mapSatisfies(etalonMap, windowMap)) {     // увеличиваем левый указатель пока удовлетворяет
+            let curWindow = s.slice(l, r + 1)
+            let windowLen = r - l + 1
+            if (windowLen < resLength) {
+                res = curWindow
+                resLength = windowLen
+            }
+
+            if (windowMap.has(s[l])) {
+                windowMap.set(s[l], windowMap.get(s[l]) - 1)
+            }
+
+            l++
+        }
+
+        r++
+    }
+
+    return res
 };
 
-console.log(minWindow("ADOBECODEBANC", "ABC"))
+minWindow("ADOBECODEBANC", "ABC")
